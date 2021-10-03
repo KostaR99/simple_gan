@@ -7,8 +7,8 @@ from tqdm import tqdm
 
 class GAN():
     def __init__(self,batch_size):
-        self.generator = gen.create_generator()
-        self.discriminator = disc.create_discriminator()
+        self.generator = gen.Generator()
+        self.discriminator = disc.Discriminator()
         self.loss = BinaryCrossentropy(from_logits=True)
         self.generator_optimizer = tf.keras.optimizers.Adam(0.0002,0.5)
         self.discriminator_optimizer = tf.keras.optimizers.Adam(0.0002,0.5)

@@ -3,21 +3,33 @@ from tensorflow import keras
 from keras.models import Model
 from keras.layers import Dense,LeakyReLU,Reshape,Conv2DTranspose,BatchNormalization,InputLayer
 
-def create_generator():
-    generator = keras.Sequential()
-    generator.add(Dense(7*7*256,input_shape=(100,),use_bias=False))
-    generator.add(BatchNormalization())
-    generator.add(LeakyReLU())
+class Generator(Model):
+    def __init__(self):
+        super(Generator, self).__init__()
+        self.dense = Dense(7*7*256,input_shape=(100,),use_bias=False)
+        self.batch1 = BatchNormalization()
+        self.leaky1 = LeakyReLU()
 
-    generator.add(Reshape((7,7,256)))
-    generator.add(Conv2DTranspose(128,5,1,padding='same',use_bias=False))
-    generator.add(BatchNormalization())
-    generator.add(LeakyReLU())
+        self.reshape = Reshape((7,7,256))
+        self.convt1 = Conv2DTranspose(128,5,1,padding='same',use_bias=False)
+        self.batch2 = BatchNormalization()
+        self.leaky2 = LeakyReLU()
 
-    generator.add(Conv2DTranspose(64,5,2,padding='same',use_bias=False))
-    generator.add(BatchNormalization())
-    generator.add(LeakyReLU())
+        self.convt2 = Conv2DTranspose(64,5,2,padding='same',use_bias=False)
+        self.batch3 = BatchNormalization()
+        self.leaky3 = LeakyReLU()
 
-    generator.add(Conv2DTranspose(1,5,2,padding='same',activation='tanh',use_bias=False))
+        self.convt3 = Conv2DTranspose(1,5,2,padding='same',use_bias=False,activation='tanh')
+    
+    def call(self,x):
+        x = self.leaky1(self.batch1(self.dense(x)))
 
-    return generator
+        x = self.reshape(x)
+
+        x = self.leaky2(self.batch2(self.convt1(x)))
+        x = self.leaky3(self.batch3(self.convt2(x)))
+
+        x = self.convt3(x)
+
+        return x
+
